@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+    font-family: beaufort;
+    src: url('./fonts/BeaufortforLOL-Regular.ttf');
+}
+
+.app {
+    background: linear-gradient(rgba(30, 33, 43, 0.75), rgba(60, 63, 73, 0.75)), url(./assets/background.jpg);
+        background-attachment: fixed;
+        background-size: cover;
+        min-height: 100vh;
+        font-family: 'beaufort';
+}

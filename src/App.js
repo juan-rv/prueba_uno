@@ -4,7 +4,7 @@ import Cards from "../src/components/Cards.jsx";
 
 function App() {
   return (
-    <div className="bg-cover bg-center h-screen bg-[url('./assets/background.jpg')]">
+    <div className=" app ">
       <NavBar />
       <Posts />
       <Cards />
