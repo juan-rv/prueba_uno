@@ -3,26 +3,23 @@ import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import axios from "axios";
 
 const Cards = () => {
-  const [characters, setCharacters] = useState([]); //estado de los personajes
-  const [currentPage, setCurrentPage] = useState(1); //estado paginacion
-  const [totalPages, setTotalPages] = useState(0); // estado total de paginas
-  const [hoveredCharacterId, setHoveredCharacterId] = useState(null); //estado para indicar que la tarjeta esta siendo senalada por el mouse
-  const [selectedCharacter, setSelectedCharacter] = useState(null); // estado para almacenar el personaje seleccionada y usarlo en el modal
-  const [searchTerm, setSearchTerm] = useState(""); // estado para almacenar el termino de busqueda
+  const [characters, setCharacters] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [hoveredCharacterId, setHoveredCharacterId] = useState(null);
+  const [selectedCharacter, setSelectedCharacter] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const charactersPerPage = 5; //total de personajes por pagina
+  const charactersPerPage = 5;
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //funcion para llamar la api y la paginacion
-  const fetchCharacters = async () => {
+  const fetchCharacters = async (page) => {
     try {
       const response = await axios.get(
         "https://gateway.marvel.com:443/v1/public/characters",
         {
           params: {
             apikey: "69512f5828be08dc3beeb74a45664d4e",
-            offset: (currentPage - 1) * charactersPerPage,
+            offset: (page - 1) * charactersPerPage,
             limit: charactersPerPage,
           },
         }
@@ -38,9 +35,6 @@ const Cards = () => {
     }
   };
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //funcion para llamar la api y que me permitira realizar la busqueda en todas las paginas
   const fetchCharactersBySearch = async () => {
     try {
       const response = await axios.get(
@@ -48,7 +42,7 @@ const Cards = () => {
         {
           params: {
             apikey: "69512f5828be08dc3beeb74a45664d4e",
-            offset: 0,
+            offset: (currentPage - 1) * charactersPerPage,
             limit: charactersPerPage,
             nameStartsWith: searchTerm,
           },
@@ -69,26 +63,22 @@ const Cards = () => {
     if (searchTerm) {
       fetchCharactersBySearch();
     } else {
-      fetchCharacters();
+      fetchCharacters(currentPage);
     }
-  }, [searchTerm]);
+  }, [currentPage, searchTerm]);
 
-  //funcion para moverse entre paginas
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+      setCurrentPage((prevPage) => prevPage - 1);
     }
   };
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
+      setCurrentPage((prevPage) => prevPage + 1);
     }
   };
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //funciones para manejar los eventos que indican que la tarjeta esta seleccionada y deseleccionada
   const handleMouseEnter = (characterId) => {
     setHoveredCharacterId(characterId);
   };
@@ -97,9 +87,6 @@ const Cards = () => {
     setHoveredCharacterId(null);
   };
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-
-  //funciones de consumo de la api por character, la apertura y cierre del modal
   const handleCharacterClick = async (character) => {
     try {
       const response = await axios.get(
@@ -121,16 +108,13 @@ const Cards = () => {
     setSelectedCharacter(null);
   };
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-  //funcion para la busqueda de los personajes
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
+    setCurrentPage(1); // Reiniciar la página cuando se realiza una búsqueda
   };
 
   return (
     <div>
-      {/* BARRA DE BUSQUEDA */}
-
       <div className="flex justify-center my-4">
         <input
           type="text"
@@ -140,8 +124,6 @@ const Cards = () => {
           className="px-2 py-1 border bg-[#111111] w-96  text-lg text-[#c89b3c]  border-gray-300 rounded-md focus:outline-none focus:ring-blue-400"
         />
       </div>
-
-      {/* CARDS */}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 lg:grid-cols-5 ml-7">
         {characters.map((character) => (
@@ -186,8 +168,6 @@ const Cards = () => {
           </div>
         ))}
       </div>
-
-      {/* PAGINACION */}
 
       <div className="flex justify-center pt-4 pb-4">
         <button
